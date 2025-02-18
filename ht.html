@@ -1,1 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Japan Counties 3D Extrusion Map</title>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.css" rel="stylesheet">
+  <style>
+    body { margin: 0; padding: 0; }
+    #map { width: 100%; height: 100vh; }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1IjoibGl1Y2lyIiwiYSI6ImNtNmlpZXV2cDA5MHAycXEycTdnamcxYTgifQ.3zHmc6lb0rTDqviif3czcQ';
+
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [137.0, 36.0], // Japan center
+    zoom: 5,
+    pitch: 45 // Make the map look 3D
+  });
+
+  map.on('load', function () {
+    map.addSource('japan-counties', {
+      type: 'geojson',
+      data: 'https://raw.githubusercontent.com/lraisys/lab03_raisys/main/assets/california.json' // Replace with Japan counties GeoJSON URL
+    });
+
+    map.addLayer({
+      id: 'county-extrusions',
+      type: 'fill-extrusion',
+      source: 'japan-counties',
+      paint: {
+        'fill-extrusion-color': [
+          'rgb',
+          Math.random() * 255, Math.random() * 255, Math.random() * 255
+        ],
+        'fill-extrusion-height': [
+          'interpolate',
+          ['linear'],
+          ['get', 'value'], // Random height generator (or any property in GeoJSON)
+          0, 0,
+          100, Math.random() * 1000 // Random height for demonstration
+        ],
+        'fill-extrusion-base': 0,
+        'fill-extrusion-opacity': 0.7
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
+
 

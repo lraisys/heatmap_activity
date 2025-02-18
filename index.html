@@ -1,1 +1,142 @@
+<!DOCTYPE html>
+<html>
 
+<head>
+    <meta charset="utf-8">
+    <title>Major Earthquakes in California - Magnitude 5.0 and Higher</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Title */
+        .title {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1;
+        }
+
+        /* Legend */
+        .legend {
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 3px;
+            padding: 10px;
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1;
+            font-size: 14px;
+        }
+
+        .legend div {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .legend .swatch {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Title on the webpage -->
+    <div class="title">
+        Major Earthquakes in California: Magnitude 5.0 and Higher
+    </div>
+    <div id="map"></div>
+    <div class="legend">
+        <h4>Magnitude Legend</h4>
+        <div>
+            <div class="swatch" style="background-color: rgba(255, 255, 0, 1);"></div>
+            <div>Magnitude 5.0: Yellow</div>
+        </div>
+        <div>
+            <div class="swatch" style="background-color: rgba(255, 165, 0, 1);"></div>
+            <div>Magnitude 6.0: Orange</div>
+        </div>
+        <div>
+            <div class="swatch" style="background-color: rgba(255, 69, 0, 1);"></div>
+            <div>Magnitude 7.0: Red-Orange</div>
+        </div>
+        <div>
+            <div class="swatch" style="background-color: rgba(255, 0, 0, 1);"></div>
+            <div>Magnitude 8.0+: Red</div>
+        </div>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoibGl1Y2lyIiwiYSI6ImNtNmlpZXV2cDA5MHAycXEycTdnamcxYTgifQ.3zHmc6lb0rTDqviif3czcQ';
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/dark-v10',
+            center: [-119.4179, 36.7783], // Centered around California
+            zoom: 5.75 // Set zoom level to 5.75
+        });
+
+        map.on('load', () => {
+            // Add a geojson point source.
+            map.addSource('earthquakes', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/lraisys/lab03_raisys/main/assets/earthquakes.geojson'
+            });
+
+            // Adding circle markers for the earthquakes
+            map.addLayer({
+                'id': 'earthquakes-points',
+                'type': 'circle',
+                'source': 'earthquakes',
+                'paint': {
+                    // Size circles based on magnitude
+                    'circle-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'magnitude'],
+                        5.0,  // Minimum magnitude (5.0)
+                        4,    // Minimum circle size
+                        8.0,  // Maximum magnitude (approx)
+                        12    // Maximum circle size
+                    ],
+                    // Color circles based on magnitude
+                    'circle-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'magnitude'],
+                        5.0, 'rgba(255, 255, 0, 1)', // Yellow for Magnitude 5.0
+                        6.0, 'rgba(255, 165, 0, 1)', // Orange for Magnitude 6.0
+                        7.0, 'rgba(255, 69, 0, 1)', // Red-Orange for Magnitude 7.0
+                        8.0, 'rgba(255, 0, 0, 1)'  // Bright Red for Magnitude 8.0+
+                    ],
+                    // Border and styling
+                    'circle-stroke-color': 'white',
+                    'circle-stroke-width': 1,
+                    'circle-opacity': 0.8
+                }
+            }, 'waterway-label');
+        });
+    </script>
+
+</body>
+
+</html>
